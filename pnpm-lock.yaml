@@ -26,6 +26,9 @@ dependencies:
   three:
     specifier: ^0.163.0
     version: 0.163.0
+  three-stdlib:
+    specifier: ^2.29.6
+    version: 2.29.6(three@0.163.0)
   three.meshline:
     specifier: ^1.4.0
     version: 1.4.0

@@ -1,126 +1,30 @@
 "use client";
-import { Canvas, useLoader } from "@react-three/fiber";
+import { Canvas, useLoader, useThree } from "@react-three/fiber";
 import { Line, OrbitControls, TransformControls } from "@react-three/drei";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
-import {
-  Fragment,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type SetStateAction,
-} from "react";
-import type { Object3D } from "three";
+import { Fragment, useRef, useState, type SetStateAction } from "react";
+import { Dot } from "@/componenets/Dot";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+import { getRef, pota, type PositionObj } from "@/utils";
+import type { Mesh } from "three";
 
-type Position = {
-  x: number;
-  y: number;
-  z: number;
-};
-
-type DotProps = {
-  x: number;
-  y: number;
-  z: number;
-  id: string | number;
-  orbit: any;
-  mode: Mode;
-  updatePosition: SetStateAction<any>;
-};
-
-const Dot = ({ x, y, z, orbit, id, updatePosition, mode }: DotProps) => {
-  const meshRef = useRef<Object3D>();
-  const transform = useRef<any>(null);
-
-  const [hovered, setHovered] = useState(false);
-
-  useEffect(() => {
-    if (transform.current) {
-      const controls = transform.current;
-      controls.setMode("translate");
-      const callback = (event: any) => {
-        if (event.value === false) {
-          updatePosition((p) =>
-            p.map((dot, idx) => (idx === id ? meshRef.current?.position : dot))
-          );
-        }
-        orbit.current.enabled = !event.value;
-      };
-
-      controls.addEventListener("dragging-changed", callback);
-
-      return () => {
-        controls.removeEventListener("dragging-changed", callback);
-      };
-    }
-  });
-
-  const handleMouseEnter = () => {
-    // meshRef.current.material.set("#ff0000");
-    meshRef.current.material.color = {
-      isColor: true,
-      r: 1,
-      g: 0,
-      b: 0,
-    };
-    // setHovered(true);
-  };
-
-  const handleMouseLeave = () => {
-    meshRef.current.material.color = {
-      isColor: true,
-      r: 0,
-      g: 1,
-      b: 0,
-    };
-    // meshRef.current.material.set("#ffff00");
-    // setHovered(false);
-  };
-
-  return mode === "edit" ? (
-    <TransformControls ref={transform} object={meshRef}>
-      <mesh
-        ref={meshRef}
-        position={[x, y, z]}
-        onPointerEnter={handleMouseEnter}
-        onPointerLeave={handleMouseLeave}
-        onContextMenu={(e) => {
-          updatePosition((p) => p.filter((_, idx) => idx !== id));
-        }}
-      >
-        <sphereGeometry args={[0.3, 15, 15]} />
-        <meshStandardMaterial color={hovered ? "red" : "hotpink"} />
-      </mesh>
-    </TransformControls>
-  ) : (
-    <mesh
-      ref={meshRef}
-      position={[x, y, z]}
-      onPointerEnter={handleMouseEnter}
-      onPointerLeave={handleMouseLeave}
-      onContextMenu={(e) => {
-        updatePosition((p) => p.filter((_, idx) => idx !== id));
-      }}
-    >
-      <sphereGeometry args={[0.3, 15, 15]} />
-      <meshStandardMaterial color={"lightgreen"} />
-    </mesh>
-  );
-};
-
-type Mode = "view" | "edit" | "create";
+export type Mode = "view" | "edit" | "create";
+export type DotType = "line" | "ring" | "tooltip";
 
 const modes: Mode[] = ["view", "create", "edit"];
 
 export default function Home() {
   const [mode, setMode] = useState<Mode>("view");
-  const [dots, setDots] = useState<any[]>([]);
-
+  const [dotType, setDotType] = useState<DotType>("line");
+  const [lineDots, setLineDots] = useState<PositionObj[]>([]);
+  const [rings, setRings] = useState<PositionObj[]>([]);
+  const [tooltips, setTooltips] = useState<PositionObj[]>([]);
   const [pointerClick, setPointerClick] = useState<{ x: number; y: number }>();
 
-  const orbit = useRef(null);
-
   const gltf = useLoader(GLTFLoader, "/treeLogs.glb");
+
+  const orbitRef = useRef<OrbitControlsImpl>(null);
+  const xd = useRef<any>();
 
   const addDot = (event: any) => {
     event.stopPropagation();
@@ -138,12 +42,34 @@ export default function Home() {
     const { point } = event.intersections[0];
 
     const position = {
-      x: Number(point.x.toFixed(2)),
-      y: Number(point.y.toFixed(2)),
-      z: Number(point.z.toFixed(2)),
+      x: point.x,
+      y: point.y,
+      z: point.z,
     };
 
-    setDots((d) => [...d, position]);
+    switch (dotType) {
+      case "line":
+        setLineDots((d) => [...d, position]);
+        break;
+      case "ring":
+        setRings((d) => [...d, position]);
+        break;
+      case "tooltip":
+        setTooltips((d) => [...d, position]);
+    }
+  };
+
+  const handleDotTransformStart = () => {
+    const orbit = getRef(orbitRef);
+    orbit.enabled = false;
+  };
+
+  const handleDotTransformEnd = (dotRef: Mesh, id: number) => {
+    const orbit = getRef(orbitRef);
+    orbit.enabled = true;
+    setLineDots((p) =>
+      p.map((pos, idx) => (idx === id ? dotRef.position : pos))
+    );
   };
 
   return (
@@ -168,26 +94,16 @@ export default function Home() {
           >
             <primitive object={gltf.scene} />
           </mesh>
-          {dots.map((props, idx, arr) =>
-            idx === arr.length - 1 ? (
-              <Fragment key={idx}>
-                <Dot
-                  mode={mode}
-                  {...props}
-                  orbit={orbit}
-                  updatePosition={setDots}
-                  id={idx}
-                />
-              </Fragment>
-            ) : (
-              <Fragment key={idx}>
-                <Dot
-                  {...props}
-                  mode={mode}
-                  orbit={orbit}
-                  updatePosition={setDots}
-                  id={idx}
-                />
+          {lineDots.map((props, idx, arr) => (
+            <Fragment key={idx}>
+              <Dot
+                mode={mode}
+                position={props}
+                onTransformStart={handleDotTransformStart}
+                onTransformEnd={handleDotTransformEnd}
+                id={idx}
+              />
+              {idx < arr.length - 1 && (
                 <Line
                   linewidth={10}
                   lineWidth={10}
@@ -197,28 +113,40 @@ export default function Home() {
                     [arr[idx + 1].x, arr[idx + 1].y, arr[idx + 1].z],
                   ]}
                 />
-              </Fragment>
-            )
-          )}
+              )}
+            </Fragment>
+          ))}
 
-          <OrbitControls ref={orbit} />
+          {rings.map((ring, idx) => {
+            return (
+              <mesh position={pota(ring)} key={idx}>
+                <boxGeometry args={[0.1, 0.1, 0.1]} />
+                <meshStandardMaterial color={0xffff00} />
+              </mesh>
+            );
+          })}
+
+          <OrbitControls ref={orbitRef} />
         </Canvas>
-        <button
-          onClick={() =>
-            setMode((p) => modes[(modes.indexOf(p) + 1) % modes.length])
-          }
-        >
-          {mode}
-        </button>
-        <div>dots: {dots.length}</div>
+
+        <div style={{ display: "flex", gap: "12px", padding: "12px" }}>
+          <button
+            onClick={() =>
+              setMode((p) => modes[(modes.indexOf(p) + 1) % modes.length])
+            }
+          >
+            {modes[(modes.indexOf(mode) + 1) % modes.length]}
+          </button>
+
+          <button onClick={() => setDotType("line")}>line</button>
+          <button onClick={() => setDotType("ring")}>ring</button>
+          <button onClick={() => setDotType("tooltip")}>tooltip</button>
+        </div>
+        <div>dot type:{dotType}</div>
+        <div>mode:{mode}</div>
+        <div>dots: {lineDots.length}</div>
+        <div>rings: {rings.length}</div>
       </main>
-      <div style={{ display: "flex", flexDirection: "column" }}>
-        {dots.map((dot) => (
-          <div
-            key={dot.x + dot.y}
-          >{`x: ${dot.x}, y: ${dot.y}, z:${dot.z}`}</div>
-        ))}
-      </div>
     </div>
   );
 }
