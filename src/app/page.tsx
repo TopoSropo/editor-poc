@@ -21,7 +21,7 @@ export default function Home() {
   const [tooltips, setTooltips] = useState<PositionObj[]>([]);
   const [pointerClick, setPointerClick] = useState<{ x: number; y: number }>();
 
-  const gltf = useLoader(GLTFLoader, "/treeLogs.glb");
+  // const gltf = useLoader(GLTFLoader, "/treeLogs.glb");
 
   const orbitRef = useRef<OrbitControlsImpl>(null);
   const xd = useRef<any>();
@@ -92,7 +92,7 @@ export default function Home() {
             }}
             onPointerUp={addDot}
           >
-            <primitive object={gltf.scene} />
+            {/* <primitive object={gltf.scene} /> */}
           </mesh>
           {lineDots.map((props, idx, arr) => (
             <Fragment key={idx}>
