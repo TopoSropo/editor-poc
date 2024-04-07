@@ -1,10 +1,10 @@
-import type { Mode } from "@/app/page";
 import { pota, type PositionObj } from "@/utils";
 import { TransformControls } from "@react-three/drei";
 import { TransformControls as TransformControlsImpl } from "three-stdlib";
 
 import { useEffect, useRef } from "react";
 import { Mesh, type MeshStandardMaterial, type SphereGeometry } from "three";
+import type { Mode } from "@/componenets/Test";
 
 type DotProps = {
   position: PositionObj;

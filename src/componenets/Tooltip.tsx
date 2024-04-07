@@ -1,4 +1,4 @@
-import type { Mode } from "@/app/page";
+import type { Mode } from "@/componenets/Test";
 import type { PositionObj } from "@/utils";
 
 type DotProps = {
