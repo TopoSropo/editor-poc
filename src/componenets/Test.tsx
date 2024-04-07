@@ -70,6 +70,10 @@ export function Test() {
     );
   };
 
+  const handleDelete = (id: number) => {
+    setLineDots((p) => p.filter((_, idx) => id !== idx));
+  };
+
   return (
     <div style={{ width: "100%", height: "100%", display: "flex" }}>
       <main
@@ -95,6 +99,7 @@ export function Test() {
           {lineDots.map((props, idx, arr) => (
             <Fragment key={idx}>
               <Dot
+                onContextMenu={handleDelete}
                 mode={mode}
                 position={props}
                 onTransformStart={handleDotTransformStart}
@@ -144,6 +149,10 @@ export function Test() {
         <div>mode:{mode}</div>
         <div>dots: {lineDots.length}</div>
         <div>rings: {rings.length}</div>
+        <span>
+          to add line enter create mode, right click to remove line dot dot type
+          rings add squares :shrug:
+        </span>
       </main>
     </div>
   );

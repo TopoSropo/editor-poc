@@ -12,6 +12,7 @@ type DotProps = {
   mode: Mode;
   onTransformStart: VoidFunction;
   onTransformEnd: (ref: Mesh, id: number) => void;
+  onContextMenu: (id: number) => void;
 };
 
 export const Dot = ({
@@ -20,6 +21,7 @@ export const Dot = ({
   mode,
   onTransformStart,
   onTransformEnd,
+  onContextMenu,
 }: DotProps) => {
   const meshRef = useRef(new Mesh<SphereGeometry, MeshStandardMaterial>());
   const transformRef = useRef<TransformControlsImpl>(null);
@@ -59,6 +61,7 @@ export const Dot = ({
       position={pota(position)}
       onPointerEnter={handleMouseEnter}
       onPointerLeave={handleMouseLeave}
+      onContextMenu={() => onContextMenu(id)}
     >
       <sphereGeometry args={[0.1, 15, 15]} />
       <meshStandardMaterial color={0x00ff00} />
