@@ -20,6 +20,8 @@ export default function RootLayout({
       <body className={inter.className}>
         <Header />
         {children}
+        model from:
+        https://sketchfab.com/3d-models/aspen-treen-stumps-logs-stack-1b9af771bc6d4f4d8c4671cf61ba851d
       </body>
     </html>
   );
