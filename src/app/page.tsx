@@ -12,7 +12,13 @@ const DynamicTest = dynamic(
 );
 export default function Home() {
   return (
-    <div>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        width: "100%",
+      }}
+    >
       <Suspense fallback={null}>
         <DynamicTest />
       </Suspense>
