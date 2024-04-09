@@ -182,7 +182,6 @@ const Foo = () => {
 
     const f = (a: any) => {
       const x = a.child;
-      // sF((p) => [...p, x.position]);
       if (!line) return;
 
       const connectionMaterial = new LineBasicMaterial({ color: 0xff0000 });

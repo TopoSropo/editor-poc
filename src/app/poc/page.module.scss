@@ -1,3 +1,18 @@
-.foo {
-  background-color: red;
+.container {
+  display: flex;
+  flex-direction: column;
+
+  padding: 20px;
+  gap: 20px;
+}
+
+.modes {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.modeButton {
+  padding: 10px;
+  cursor: pointer;
 }
