@@ -33,3 +33,7 @@ export const getRef = <T extends React.RefObject<any>>(
 
   return ref.current;
 };
+
+export function dist(a: { x: number; y: number }, b: { x: number; y: number }) {
+  return ((a.x - b.x) ** 2 + (a.y - b.y) ** 2) ** 0.5;
+}
