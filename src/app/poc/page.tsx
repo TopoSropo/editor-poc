@@ -1,10 +1,33 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import styles from "./page.module.scss";
+import {
+  Canvas,
+  useLoader,
+  useThree,
+  type ThreeEvent,
+} from "@react-three/fiber";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+import { OrbitControls } from "@react-three/drei";
+import { GLTFLoader } from "three/examples/jsm/Addons.js";
+import { MeshBasicMaterial, SphereGeometry } from "three";
 
 type Mode = "view" | "create" | "edit";
 
-type DotType = "route" | "ring" | "tooltip";
+type DotType = "route" | "ring" | "info";
+
+const sceneObjects = {
+  model: "model",
+  route: "route",
+  helperDot: "helperDot",
+};
+
+const dotGeometry = new SphereGeometry(0.1, 15, 15);
+const helperDotMaterial = new MeshBasicMaterial({
+  color: 0xff00ff,
+  opacity: 0.5,
+  transparent: true,
+});
 
 export default function Poc() {
   const [mode, setMode] = useState<Mode>("view");
@@ -68,20 +91,104 @@ export default function Poc() {
         </button>
         <button
           disabled={mode !== "create"}
-          onClick={() => setEntityType("tooltip")}
+          onClick={() => setEntityType("info")}
           style={{
             backgroundColor:
-              entityType === "tooltip" && mode === "create"
-                ? "green"
-                : "initial",
+              entityType === "info" && mode === "create" ? "green" : "initial",
           }}
           className={styles.modeButton}
         >
-          tooltip
+          info
         </button>
       </div>
-
-      <div>canvas</div>
+      <Scene mode={mode} />
     </div>
   );
 }
+
+type SceneProps = {
+  mode: Mode;
+};
+
+const Scene = ({ mode }: SceneProps) => {
+  const orbitRef = useRef<OrbitControlsImpl>(null);
+
+  return (
+    <main
+      style={{
+        height: "800px",
+        width: "1024px",
+        border: "1px solid red",
+        boxSizing: "content-box",
+      }}
+    >
+      <Canvas camera={{ position: [8, 8, 8] }}>
+        <Model mode={mode} />
+        {mode === "create" && <HelperDot />}
+        <OrbitControls ref={orbitRef} />
+      </Canvas>
+    </main>
+  );
+};
+
+type ModelProps = {
+  mode: Mode;
+};
+
+const Model = ({ mode }: ModelProps) => {
+  const model = useLoader(GLTFLoader, "/treeLogs.glb");
+
+  const { scene } = useThree();
+
+  const handleMouseMove = (e: ThreeEvent<PointerEvent>) => {
+    const intersection = e.intersections.find(
+      (el) => el.eventObject.name === sceneObjects.model
+    );
+
+    if (!intersection) return;
+
+    const helperDot = scene.getObjectByName(sceneObjects.helperDot);
+    if (!helperDot) return;
+
+    helperDot.position.copy(intersection.point);
+  };
+
+  const handleMouseOut = () => {
+    const helperDot = scene.getObjectByName(sceneObjects.helperDot);
+    if (!helperDot) return;
+
+    helperDot.visible = false;
+  };
+
+  const handleMouseEnter = () => {
+    const helperDot = scene.getObjectByName(sceneObjects.helperDot);
+    if (!helperDot) return;
+
+    helperDot.visible = true;
+  };
+
+  return (
+    <mesh
+      name={sceneObjects.model}
+      {...(mode === "create"
+        ? {
+            onPointerMove: handleMouseMove,
+            onPointerLeave: handleMouseOut,
+            onPointerEnter: handleMouseEnter,
+          }
+        : {})}
+    >
+      <primitive object={model.scene} />
+    </mesh>
+  );
+};
+
+const HelperDot = () => {
+  return (
+    <mesh
+      name={sceneObjects.helperDot}
+      geometry={dotGeometry}
+      material={helperDotMaterial}
+    />
+  );
+};
