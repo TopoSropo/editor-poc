@@ -1,4 +1,4 @@
-import { helperMaterial, sceneObjects } from "@/app/page";
+import { helperMaterial, sceneObjects } from "@/componenets/POC/scene";
 
 export const HelperConnection = () => {
   return (

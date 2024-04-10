@@ -1,14 +1,18 @@
 import { type RefObject } from "react";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { type Mode, routeDotMaterial } from "@/app/page";
+import { type Mode } from "@/app/page";
 
 import { useRef, useState } from "react";
 import { useLoader, useThree, type ThreeEvent } from "@react-three/fiber";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import { CylinderGeometry, Group, Mesh, type Vector3 } from "three";
 import { dist } from "@/utils";
-import { sceneObjects, dotGeometry } from "@/app/page";
 import { Route } from "@/componenets/POC/Route";
+import {
+  sceneObjects,
+  dotGeometry,
+  routeDotMaterial,
+} from "@/componenets/POC/scene";
 
 export type ModelProps = {
   mode: Mode;

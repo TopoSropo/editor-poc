@@ -17,27 +17,6 @@ export type Mode = "view" | "create" | "edit";
 
 export type DotType = "route" | "ring" | "info";
 
-export const sceneObjects = {
-  model: "model",
-  route: "route",
-  helperDot: "helperDot",
-  helperConnection: "helperConnection",
-  helperPivot: "helperPivot",
-  dot: "dot",
-  lastDot: "helperDOt",
-};
-
-export const dotGeometry = new SphereGeometry(0.1, 15, 15);
-export const helperMaterial = new MeshBasicMaterial({
-  color: 0xff00ff,
-  opacity: 0.5,
-  transparent: true,
-});
-
-export const routeDotMaterial = new MeshBasicMaterial({
-  color: 0x00ff00,
-});
-
 export default function Poc() {
   const [mode, setMode] = useState<Mode>("create");
   const [entityType, setEntityType] = useState<DotType>("route");

@@ -1,4 +1,8 @@
-import { dotGeometry, helperMaterial, sceneObjects } from "@/app/page";
+import {
+  sceneObjects,
+  dotGeometry,
+  helperMaterial,
+} from "@/componenets/POC/scene";
 
 export const HelperDot = () => {
   return (
