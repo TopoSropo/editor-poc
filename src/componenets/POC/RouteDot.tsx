@@ -3,7 +3,7 @@ import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { TransformControls as TransformControlsImpl } from "three-stdlib";
 import { TransformControls } from "@react-three/drei";
 import { Mesh, type Vector3 } from "three";
-import { dotGeometry, routeDotMaterial, type Mode } from "@/app/poc/page";
+import { dotGeometry, routeDotMaterial, type Mode } from "@/app/page";
 
 type RouteDotProps = {
   name: string;

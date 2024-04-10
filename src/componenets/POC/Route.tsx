@@ -1,7 +1,7 @@
 import { type RefObject } from "react";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { type Vector3 } from "three";
-import { sceneObjects, type Mode } from "@/app/poc/page";
+import { sceneObjects, type Mode } from "@/app/page";
 import { RouteDot } from "@/componenets/POC/RouteDot";
 import { Connection } from "@/componenets/POC/Connection";
 
