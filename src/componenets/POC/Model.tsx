@@ -1,6 +1,6 @@
 import { type RefObject } from "react";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { type Mode } from "@/app/page";
+import { type DotType, type Mode } from "@/app/page";
 
 import { useRef, useState } from "react";
 import { useLoader, useThree, type ThreeEvent } from "@react-three/fiber";
@@ -12,20 +12,28 @@ import {
   sceneObjects,
   dotGeometry,
   routeDotMaterial,
+  ringGeometry,
+  ringMaterial,
 } from "@/componenets/POC/scene";
 
 export type ModelProps = {
   mode: Mode;
   orbitRef: RefObject<OrbitControlsImpl>;
+  entity: DotType;
 };
 
-export const Model = ({ mode, orbitRef }: ModelProps) => {
+export const Model = ({ mode, entity, orbitRef }: ModelProps) => {
   const model = useLoader(GLTFLoader, "/treeLogs.glb");
   const pointerRef = useRef({ x: 0, y: 0 });
 
   const { scene } = useThree();
 
   const [routePoints, setRoutePoints] = useState<Vector3[]>([]);
+  const [rings, setRings] = useState<Vector3[]>([]);
+
+  const addRing = (e: ThreeEvent<PointerEvent>) => {
+    setRings((p) => [...p, e.point]);
+  };
 
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
     pointerRef.current = { x: e.clientX, y: e.clientY };
@@ -35,6 +43,11 @@ export const Model = ({ mode, orbitRef }: ModelProps) => {
     e.stopPropagation();
 
     if (dist(pointerRef.current, { x: e.clientX, y: e.clientY }) > 15) return;
+
+    if (entity === "ring") {
+      addRing(e);
+      return;
+    }
 
     const route = scene.getObjectByName(sceneObjects.route);
 
@@ -135,6 +148,16 @@ export const Model = ({ mode, orbitRef }: ModelProps) => {
       >
         <primitive object={model.scene} />
       </mesh>
+      {rings.map((ring, idx) => {
+        return (
+          <mesh
+            key={idx}
+            position={ring}
+            material={ringMaterial}
+            geometry={ringGeometry}
+          />
+        );
+      })}
       <Route
         points={routePoints}
         mode={mode}

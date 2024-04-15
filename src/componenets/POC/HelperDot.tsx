@@ -1,14 +1,20 @@
+import type { DotType } from "@/app/page";
 import {
   sceneObjects,
   dotGeometry,
   helperMaterial,
+  ringGeometry,
 } from "@/componenets/POC/scene";
 
-export const HelperDot = () => {
+type HelperDotProps = {
+  entity: DotType;
+};
+
+export const HelperDot = ({ entity }: HelperDotProps) => {
   return (
     <mesh
       name={sceneObjects.helperDot}
-      geometry={dotGeometry}
+      geometry={entity === "ring" ? ringGeometry : dotGeometry}
       material={helperMaterial}
     />
   );

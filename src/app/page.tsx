@@ -4,7 +4,6 @@ import styles from "./page.module.scss";
 import { Canvas } from "@react-three/fiber";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { OrbitControls } from "@react-three/drei";
-import { MeshBasicMaterial, SphereGeometry } from "three";
 import { HelperDot } from "@/componenets/POC/HelperDot";
 import { HelperConnection } from "@/componenets/POC/HelperConnection";
 import dynamic from "next/dynamic";
@@ -53,16 +52,17 @@ export default function Poc() {
           </button>
         ))}
       </div>
-      <Scene mode={mode} />
+      <Scene mode={mode} entityType={entityType} />
     </div>
   );
 }
 
 type SceneProps = {
   mode: Mode;
+  entityType: DotType;
 };
 
-const Scene = ({ mode }: SceneProps) => {
+const Scene = ({ mode, entityType }: SceneProps) => {
   const orbitRef = useRef<OrbitControlsImpl>(null);
 
   return (
@@ -76,10 +76,10 @@ const Scene = ({ mode }: SceneProps) => {
     >
       <Canvas camera={{ position: [8, 8, 8] }}>
         <Suspense fallback={null}>
-          <Model mode={mode} orbitRef={orbitRef} />
+          <Model mode={mode} entity={entityType} orbitRef={orbitRef} />
         </Suspense>
-        {mode === "create" && <HelperDot />}
-        {mode === "create" && <HelperConnection />}
+        {mode === "create" && <HelperDot entity={entityType} />}
+        {mode === "create" && entityType === "route" && <HelperConnection />}
 
         <OrbitControls ref={orbitRef} />
       </Canvas>
