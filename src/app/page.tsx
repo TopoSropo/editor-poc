@@ -37,7 +37,7 @@ export default function Poc() {
       </div>
       <div className={styles.modes}>
         add:
-        {(["route", "ring", "info"] as const).map((x, idx) => (
+        {(["route", "ring"] as const).map((x, idx) => (
           <button
             key={idx}
             disabled={mode !== "create"}
